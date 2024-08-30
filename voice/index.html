@@ -662,10 +662,9 @@
     speakText("You are in the Message. Say the number of the message you want to read or say back to go to the menu.", () => {
       recognition.start();
       recognition.onresult = (event) => {
-        let action = event.results[0][0].transcript.toLowerCase();
-        const input = action.toLowerCase().match(/\b(one|two|three|four|five|1|2|3|4|5)\b/); // Extract the word representing the number
-
-        const number = input ? wordsToNumbers[input[0]] : NaN; // Convert the word to a number
+        const action = event.results[0][0].transcript.toLowerCase();
+        const number = parseInt(action.match(/\d+/)); // Extract the number from the spoken input
+        //action = sanitizeInput(caction);
      
   
         if (!isNaN(number)) {
