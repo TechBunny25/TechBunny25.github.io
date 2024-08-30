@@ -678,6 +678,7 @@ const wordsToNumbers = {
         const input = action.toLowerCase().match(/\b(one|two|three|four|five|1|2|3|4|5)\b/); // Extract the word representing the number
 
         const number = input ? wordsToNumbers[input[0]] : NaN; // Convert the word to a number
+        console.log(number);
   
         if (!isNaN(number)) {
           var selectedMessage = messagesArray.find(m => m.number === number);
