@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Gmail API Quickstart</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="image/gmail logo.svg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css" />
+  </head>
+  <body>
+    <nav class="navbar navbar-light bg-light w-100">
+      <div class="container d-flex justify-content-between">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+          <img src="image/gmail logo.svg" alt="" width="40" height="24">
+        </a>
+        <a type="button" id="setting" class="text-dark d-flex align-items-center" style="text-decoration: none;" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          <i class="fa-solid fa-sliders fs-4"></i>
+        </a>
+      </div>
+       <!-- Modal -->
+       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Setting</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pe-4 ps-4">
+              <label for="customRange2" class="form-label">Rate</label>
+              <input type="range" class="form-range" min="0" max="5" id="customRange2">
+              <label for="customRange2" class="form-label">Pitch</label>
+              <input type="range" class="form-range" min="0" max="5" id="customRange2">
+              <div class="d-flex justify-content-between">
+                <a href="#" class="p-2 btn" id="start" title="start listening"><i class="fa-solid fa-ear-listen text-success"></i></a>
+                <a href="#" class="p-2 btn" id="stop" title="stop listening"><i class="fa-solid fa-ear-deaf text-danger"></i></a>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="container w-100">
+      <h1 class="mt-3">Gmail Voice App</h1>
+      <h5>Welcome to the Gmail Voice App!</h5>
+      <p class="lh-base text-break mb-3">
+        We are thrilled to introduce you to a revolutionary way of managing your emails. 
+        With the Gmail Voice App, you can read, compose, and delete your messages using just your voice. 
+        Whether you're on the go, multitasking, or simply looking for a more accessible way to handle your inbox, 
+        our app is here to make your email experience effortless and efficient.
+      </p>
+
+      <!--Add buttons to initiate auth sequence and sign out-->
+      <div class="d-flex justify-content-start">
+        <button id="authorize_button" class="btn btn-primary mb-3">Authorize</button>
+        <div class="m-1"> </div>
+        <button id="signout_button" class="btn btn-danger mb-3">Sign Out</button>
+      </div>
+     
+      <div id="info">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="message-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Message</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Compose</button>
+          </li>
+        </ul>
+        <div class="tab-content w-100" id="myTabContent">
+          <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="message-tab">
+            <div id="option_list">
+              <select id="label_selector" class="form-select form-select-sm mb-3 mt-3" style="overflow-x:auto;" aria-label=".form-select-sm example">
+                <option value="ALL" selected>All</option>
+                <option value="INBOX">Inbox</option>
+                <option value="SENT">Sent</option>
+                <option value="SPAM">Spam</option>
+                <option value="DRAFT">Draft</option>
+                <option value="TRASH">Trash</option>
+              </select>
+            </div>
+            <div class="accordion" id="accordionExample">
+            </div>
+          </div>
+          <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+            <form id="email_form" class="p-3">
+              <div class="mb-3">
+                <input type="email" class="form-control" id="to" name="to" placeholder="Reciepient's Email">
+              </div>
+              <div class="mb-3">
+                <input type="text" class="form-control" id="subject" name="subject" placeholder="Subject">
+              </div>
+              <div class="mb-3">
+                <textarea class="form-control" id="message_body" name="message_body" rows="3" placeholder="Message"></textarea>
+              </div>
+              <div class="mb-3">
+                <input type="submit" id="submit" value="Send" class="btn btn-success w-100">
+              </div>
+            </form>
+          </div>
+        </div>
+        
+      </div>
+      
+  
+      <div id="content" class="p-4"></div>
+  
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/2.1.3/js/dataTables.js"></script>
+    <script type="text/javascript">
+      /* exported gapiLoaded */
+      /* exported gisLoaded */
+      /* exported handleAuthClick */
+      /* exported handleSignoutClick */
+
+      // TODO(developer): Set to client ID and API key from the Developer Console
+      const CLIENT_ID = '796268370632-tnsqp0lmb068hojgi6lk95oiu3f07ie6.apps.googleusercontent.com';
+      const API_KEY = 'AIzaSyAC2aqejBTTZ4LFX-Lrq_x6yeOkISX-tD0';
+
+      // Discovery doc URL for APIs used by the quickstart
+      const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest';
+
+      // Authorization scopes required by the API; multiple scopes can be
+      // included, separated by spaces.
+      const SCOPES = 'https://mail.google.com/';
+
+      let tokenClient;
+      let gapiInited = false;
+      let gisInited = false;
+
+      document.getElementById('authorize_button').style.visibility = 'hidden';
+      document.getElementById('signout_button').style.visibility = 'hidden';
+      document.getElementById('info').style.visibility = 'hidden';
+      let authorize_button = document.getElementById('authorize_button');
+      let signout_button = document.getElementById('signout_button');
+      let emailForm = document.getElementById('email_form');
+      let labelSelector = document.getElementById('label_selector');
+      document.getElementById('setting').style.visibility = 'hidden';
+      const startBtn = document.querySelector('#start');
+      const stopBtn = document.querySelector('#stop');
+      
+
+      /**
+       * Callback after api.js is loaded.
+       */
+      function gapiLoaded() {
+        gapi.load('client', initializeGapiClient);
+      }
+
+      /**
+       * Callback after the API client is loaded. Loads the
+       * discovery doc to initialize the API.
+       */
+      async function initializeGapiClient() {
+        await gapi.client.init({
+          apiKey: API_KEY,
+          discoveryDocs: [DISCOVERY_DOC],
+        });
+        gapiInited = true;
+        maybeEnableButtons();
+      }
+
+      /**
+       * Callback after Google Identity Services are loaded.
+       */
+      function gisLoaded() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: SCOPES,
+          callback: '', // defined later
+        });
+        gisInited = true;
+        maybeEnableButtons();
+      }
+
+      /**
+       * Enables user interaction after all libraries are loaded.
+       */
+      function maybeEnableButtons() {
+        if (gapiInited && gisInited) {
+          document.getElementById('authorize_button').style.visibility = 'visible';
+        }
+      }
+      
+
+
+     
+      /**
+       *  Sign in the user upon button click.
+       */
+      authorize_button.addEventListener('click',
+        function handleAuthClick() {
+          tokenClient.callback = async (resp) => {
+            if (resp.error !== undefined) {
+              throw (resp);
+            }
+            document.getElementById('info').style.visibility = 'visible';
+            document.getElementById('signout_button').style.visibility = 'visible';
+            document.getElementById('authorize_button').innerText = 'Refresh';
+            document.getElementById('setting').style.visibility = 'visible';
+            startApp();
+            await listMessages();
+            
+            
+          };
+
+          if (gapi.client.getToken() === null) {
+            // Prompt the user to select a Google Account and ask for consent to share their data
+            // when establishing a new session.
+            tokenClient.requestAccessToken({prompt: 'consent'});
+          } else {
+            // Skip display of account chooser and consent dialog for an existing session.
+            tokenClient.requestAccessToken({prompt: ''});
+          }
+      })
+
+      /**
+       *  Sign out the user upon button click.
+       */
+      signout_button.addEventListener('click',
+        function handleSignoutClick() {
+          const token = gapi.client.getToken();
+          if (token !== null) {
+            google.accounts.oauth2.revoke(token.access_token);
+            gapi.client.setToken('');
+            document.getElementById('content').innerText = '';
+            document.getElementById('authorize_button').innerText = 'Authorize';
+            document.getElementById('signout_button').style.visibility = 'hidden';
+            document.getElementById('info').style.visibility = 'hidden';
+            document.getElementById('setting').style.visibility = 'hidden';
+            stopAll();
+          }
+        });
+      /**
+     * Print all Messages in the user's inbox.
+     */
+    label_selector.addEventListener('change', listMessages);
+    function listMessages() {
+     
+      var selectedLabel = labelSelector.value;
+      var requestParams = {
+        'userId': 'me',
+        'maxResults': 5
+      };
+
+      if (selectedLabel !== 'ALL') {
+        requestParams.labelIds = [selectedLabel];
+      }
+
+      console.log(selectedLabel);
+
+      gapi.client.gmail.users.messages.list(requestParams).then(function(response) {
+        messagesArray = [];
+        var accordion = document.getElementById('accordionExample');
+        accordion.innerHTML = ''; // Clear previous messages
+
+        var messages = response.result.messages;
+        if (messages && messages.length > 0) {
+          var requests = messages.map((message, index) => getMessage(message.id, index + 1));
+          Promise.all(requests).then(displayMessages);
+        } else {
+          accordion.innerHTML = '<div class="text-center">No trashed '+ selectedLabel +' found.</div>';
+        }
+      });
+    }
+
+    /**
+     * Get and store a message with the given ID.
+     *
+     * @param {string} messageId ID of Message to get.
+     * @returns {Promise} Promise that resolves when the message is fetched and stored.
+     */
+    function getMessage(messageId, index) {
+      return gapi.client.gmail.users.messages.get({
+        'userId': 'me',
+        'id': messageId
+      }).then(function(response) {
+        var headers = response.result.payload.headers;
+        var from = headers.find(header => header.name === 'From')?.value || 'N/A';
+        var subject = headers.find(header => header.name === 'Subject')?.value || 'N/A';
+        var date = headers.find(header => header.name === 'Date')?.value || 'N/A';
+        var snippet = response.result.snippet || 'N/A';
+        var body = getBody(response.result.payload);
+        messagesArray.push({number: index, from: from, subject: subject, date: date, snippet: snippet, body: body});
+      });
+    }
+     /**
+     * Get the message body.
+     *
+     * @param {object} payload Message payload.
+     * @return {string} Message body as a string.
+     */
+     function getBody(payload) {
+      var encodedBody = '';
+      if (typeof payload.parts === 'undefined') {
+        encodedBody = payload.body.data;
+      } else {
+        encodedBody = getHTMLPart(payload.parts);
+      }
+      encodedBody = encodedBody.replace(/-/g, '+').replace(/_/g, '/').replace(/\s/g, '');
+      return decodeURIComponent(escape(atob(encodedBody)));
+    }
+    /**
+     * Get the HTML part of the message payload.
+     *
+     * @param {array} parts Message parts.
+     * @return {string} HTML part as a string.
+     */
+     function getHTMLPart(parts) {
+      for (var i = 0; i <= parts.length; i++) {
+        if (typeof parts[i].parts === 'undefined') {
+          if (parts[i].mimeType === 'text/html') {
+            return parts[i].body.data;
+          }
+        } else {
+          return getHTMLPart(parts[i].parts);
+        }
+      }
+      return '';
+    }
+
+    /**
+     * Display all messages stored in the messagesArray.
+     */
+    function displayMessages() {
+      messagesArray.forEach(message => {
+        appendTableRow(message.number, message.from, message.subject, message.date, message.snippet, message.body);
+      });
+    }
+
+    /**
+     * Append a row to the messages table with the given message details.
+     *
+     * @param {string} messageId ID of the message.
+     * @param {string} from Sender of the message.
+     * @param {string} subject Subject of the message.
+     * @param {string} date Date of the message.
+     * @param {string} snippet Snippet of the message.
+     */
+    function appendTableRow(number, from, subject, date, snippet, body) {
+      
+      
+      var button = document.createElement('a');
+      button.setAttribute('type', 'button'); // Set the 'href' attribute
+      button.setAttribute('class', 'text-dark d-flex align-items-center');
+      button.setAttribute('style', 'text-decoration: none;');
+      document.body.appendChild(button);
+      button.innerHTML = '<i class="fa-solid fa-eye fs-6"></i>';
+      button.onclick = function() {
+        openMessageInNewPage(subject, from, date, body);
+      };
+      console.log(number);
+      let accordion = document.getElementById('accordionExample');
+      let accordionItem = document.createElement('div');
+      let accordionTitle = document.createElement('h2');
+      let accordionButton = document.createElement('button');
+      let accordionCollapse = document.createElement('div');
+      let accordionBody = document.createElement('div');
+      let accordionContent = document.createElement('div');
+      let accordionFrom = document.createElement('div');
+      let accordionDate = document.createElement('div');
+      let accordionView = document.createElement('div');
+      let accordionText = document.createElement('div');
+
+      accordionItem.setAttribute('class', 'accordion-item');
+      accordionTitle.setAttribute('class', 'accordion-header');
+      accordionTitle.setAttribute('id', 'flush-headingOne');
+      accordionButton.setAttribute('class', 'accordion-button collapsed');
+      accordionContent.setAttribute('class', 'd-flex justify-content-between pt-3 pb-3');
+      accordionView.setAttribute('class', 'pb-3');
+      accordionButton.setAttribute('type', 'button');
+      accordionButton.setAttribute('data-bs-toggle', 'collapse');
+      accordionButton.setAttribute('data-bs-target', '#d'+number);
+      accordionButton.setAttribute('aria-expanded', 'false');
+      accordionButton.setAttribute('aria-controls', 'flush-collapseOne');
+      accordionCollapse.setAttribute('id', 'd'+number);
+      accordionCollapse.setAttribute('class', 'accordion-collapse collapse');
+      accordionCollapse.setAttribute('aria-labelledby', 'flush-headingOne');
+      accordionCollapse.setAttribute('data-bs-parent', '#accordionFlushExample');
+      accordionBody.setAttribute('class', 'accordion-body');
+      accordionButton.innerText = 'Subject: '+subject;
+      accordionText.innerText = snippet;
+      accordionDate.innerText = date;
+      accordionFrom.innerText = from;
+      accordionView.appendChild(button);
+      accordionTitle.appendChild(accordionButton);
+      accordionContent.appendChild(accordionFrom);
+      accordionContent.appendChild(accordionDate);
+      accordionBody.appendChild(accordionContent);
+      accordionBody.appendChild(accordionView);
+      accordionBody.appendChild(accordionText);
+      accordionCollapse.appendChild(accordionBody);
+      accordionItem.appendChild(accordionTitle);
+      accordionItem.appendChild(accordionCollapse);
+      accordion.appendChild(accordionItem);
+
+
+
+      
+    }
+    /**
+     * Open the message in a new page.
+     *
+     * @param {string} subject Subject of the message.
+     * @param {string} from Sender of the message.
+     * @param {string} date Date of the message.
+     * @param {string} body Body of the message.
+     */
+     function openMessageInNewPage(subject, from, date, body) {
+      var newWindow = window.open('', '_blank');
+      newWindow.document.write('<html><head><link rel="icon" type="image/x-icon" href="image/gmail logo.svg"><title>' + subject + '</title></head><body>');
+      newWindow.document.write('<h1 style="text-align: center; margin-top:2rem;">' + subject + '</h1>');
+      newWindow.document.write('<div style="margin: 0 2rem">' + body + '</div>');
+      newWindow.document.write('</body></html>');
+      newWindow.document.close();
+    }
+    
+    /**
+     * Send an email using the Gmail API.
+     *
+     * @param {Event} event Form submission event.
+     */
+    /**
+     * Handle form submission to send an email.
+     *
+     * @param {Event} event Form submission event.
+     */
+     email_form.addEventListener('submit',
+      function handleSendEmail() {
+       event.preventDefault();
+
+        var to = document.getElementById('to').value;
+        var subject = document.getElementById('subject').value;
+        var body = document.getElementById('message_body').value;
+        console.log(to + subject + body);
+
+        sendEmail(to, subject, body);
+      }
+     )
+     
+
+    /**
+     * Send an email using the Gmail API.
+     *
+     * @param {string} to Recipient of the email.
+     * @param {string} subject Subject of the email.
+     * @param {string} body Body of the email.
+     */
+    function sendEmail(to, subject, body) {
+      var email = [
+        'To: ' + to,
+        'Subject: ' + subject,
+        '',
+        body
+      ].join('\n');
+
+      var base64EncodedEmail = btoa(unescape(encodeURIComponent(email)))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+
+      gapi.client.gmail.users.messages.send({
+        'userId': 'me',
+        'resource': {
+          'raw': base64EncodedEmail
+        }
+      }).then(function(response) {
+        console.log("Email sent successfully:", response);
+        alert('Email sent successfully!');
+      }, function(error) {
+        console.error("Error sending email:", error);
+        alert('Failed to send email.');
+      });
+    }
+
+    // voice system
+    // init speechsynth API
+    function speakText(text, callback) {
+      const speech = new SpeechSynthesisUtterance(text);
+
+      // Optional: Set parameters
+      speech.lang = 'en-US'; // Language
+      speech.rate = 1; // Speed (0.1 to 10)
+      speech.pitch = 1; // Pitch (0 to 2)
+      speech.onend = () => {
+        if (callback) {
+            callback();
+            
+        }
+      };
+
+      // Speak the text
+      window.speechSynthesis.speak(speech);
+    }
+    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    //recognition.interimResults = ture;
+    recognition.maxAlternatives = 1;
+
+
+    // Function to stop both text-to-speech and speech recognition
+    function stopAll() {
+      // Stop speech synthesis
+      window.speechSynthesis.cancel();
+      // Stop speech recognition
+      recognition.stop();
+    }
+
+    // Function to sanitize speech input by removing spaces and periods
+    function sanitizeInput(input) {
+      return input.replace(/[ .]/g, ''); // Remove spaces and periods
+    }
+
+    // Define main functions
+    function startApp() {
+      speakText("Welcome to the Email Application.", showOptions);
+    }
+
+    function showOptions() {
+      speakText("Choose an option by saying: Compose, Message, Trash, or Logout.", () => {
+          recognition.start();
+          recognition.onresult = (event) => {
+              let option = event.results[0][0].transcript.toLowerCase();
+              option = sanitizeInput(option);
+              console.log(option);
+              switch(option) {
+                  case 'compose':
+                      compose();
+                      break;
+                  case 'message':
+                      message();
+                      break;
+                  case 'trash':
+                      trash();
+                      break;
+                  case 'logout':
+                      logout();
+                      break;
+                  default:
+                      speakText("Invalid option. Please try again.", showOptions);
+              }
+              
+          };
+      });
+    }
+    function compose() {
+      document.getElementById("profile-tab").click();
+      speakText("You are in the compose.", inputTo)
+    }
+
+    function inputTo(){
+      speakText("Please say the email of the receiver.", () =>{
+        recognition.start();
+        recognition.onresult = (event) => {
+          let email = event.results[0][0].transcript.toLowerCase();
+          email = sanitizeInput(email);
+          speakText(`You said ${email}. Do you confirm? say yes or no.`, () => {
+            recognition.start();
+            recognition.onresult = (event) =>{
+              let confirm = event.results[0][0].transcript.toLowerCase();
+              confirm = sanitizeInput(confirm);
+              if (confirm === 'yes'){
+                console.log(email);
+                document.getElementById("to").value = email;
+                inputSubject();
+              }else{
+                inputTo();
+              }
+            }
+          });
+        }
+      });
+    }
+
+    function inputSubject() {
+      speakText("Please say the subject of the email.", () => {
+          recognition.start();
+          recognition.onresult = (event) => {
+              const subject = event.results[0][0].transcript;
+              speakText(`You said ${subject}. Do you confirm? say yes or no.`, () => {
+                recognition.start();
+                recognition.onresult = (event) =>{
+                  let confirm = event.results[0][0].transcript.toLowerCase();
+                  confirm = sanitizeInput(confirm);
+                  if (confirm === 'yes'){
+                    console.log(subject);
+                    document.getElementById("subject").value = subject;
+                    inputMessage();
+                  }else{
+                    inputSubject();
+                  }
+                }
+              })
+          };
+      });
+  };
+  
+  function inputMessage() {
+    speakText("Please say the body of the message.", () => {
+      recognition.start();
+      recognition.onresult = (event) => {
+          const message = event.results[0][0].transcript;
+          speakText(`You said ${message}. Do you confirm? say yes or no.`, () => {
+            recognition.start();
+            recognition.onresult = (event) =>{
+              let confirm = event.results[0][0].transcript.toLowerCase();
+              confirm = sanitizeInput(confirm);
+              if (confirm === 'yes'){
+                console.log(message);
+                document.getElementById("message_body").textContent = message;
+                send();
+              }else{
+                inputMessage();
+              }
+            }
+          })
+      };
+    });
+  }
+
+  function send() {
+    speakText("Do you want to send the message? yes or no.",() =>{
+      recognition.start();
+      recognition.onresult = (event) => {
+        let confirm = event.results[0][0].transcript.toLowerCase();
+        confirm = sanitizeInput(confirm);
+        if (confirm === 'yes'){
+          document.getElementById("submit").click();
+          speakText("message as been send", doneOption);
+        }else{
+          send();
+        }
+      };
+    })
+  }
+
+  function doneOption() {
+    speakText("Do you want to compose another message? yes or no.",() =>{
+      recognition.start();
+      recognition.onresult = (event) => {
+        let confirm = event.results[0][0].transcript.toLowerCase();
+        confirm = sanitizeInput(confirm);
+        if (confirm === 'yes'){
+          compose();
+        }else{
+          document.getElementById("message-tab").click();
+          back();
+        }
+      };
+    })
+  }
+
+  function message() {
+    document.getElementById("message-tab").click();
+    speakText("You are in the Message. Say the number of the message you want to read or say back to go to the menu.", () => {
+      recognition.start();
+      recognition.onresult = (event) => {
+        let action = event.results[0][0].transcript.toLowerCase();
+        const number = parseInt(action.match(/\d+/)); // Extract the number from the spoken input
+        //action = sanitizeInput(caction);
+  
+        if (!isNaN(number)) {
+          var selectedMessage = messagesArray.find(m => m.number === number);
+          if (selectedMessage) {
+            // Read the selected message aloud
+            const messageContent = `
+              From: ${selectedMessage.from}.
+              Subject: ${selectedMessage.subject}.
+              Date: ${selectedMessage.date}.
+              Message: ${selectedMessage.snippet}.
+            `;
+            speakText(`Reading message number ${number}. ${messageContent}`, messageContinue); 
+          } else {
+            speakText("No message found with that number. Please try again.", message);
+          }
+        } else if (action.includes('back')) {
+          showOptions();
+        } else {
+          speakText("Invalid option. Please try again.", message);
+        }
+      };
+    });
+  }
+    function messageContinue() {
+        speakText("Do you want to read another message? yes or no.", () => {
+            recognition.start();
+            recognition.onresult = (event) => {
+                let action = event.results[0][0].transcript.toLowerCase();
+                action = sanitizeInput(action);
+                if (action === 'yes') {
+                    message();
+                } else if (action === 'no') {
+                    showOptions();
+                } else {
+                    speakText("Invalid option. Please try again.", messageContinue);
+                }
+            };
+        });
+    }
+     
+    function back() {
+      speakText("back to menu", startApp);
+    }
+
+    function logout() {
+      signout_button.click();
+      speakText("Logged out successfully!");
+    }
+
+    startBtn.addEventListener('click', () => {
+      console.log('start');
+      startApp();  
+    });
+
+    stopBtn.addEventListener('click', () => {
+      console.log('stop');
+      stopAll();
+    });
+      
+
+    
+
+
+   
+   
+    </script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+  </body>
+</html>
