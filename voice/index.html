@@ -598,7 +598,7 @@
     }
 
     function inputTo(){
-      speakText("Please say the email of the receiver.", () =>{
+      speakText("Please say the email name of the receiver.", () =>{
         recognition.start();
         recognition.onresult = (event) => {
           let email = event.results[0][0].transcript.toLowerCase();
