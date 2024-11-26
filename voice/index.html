@@ -45,7 +45,6 @@
       </div>
     </nav>
     <div class="container w-100">
-      <div id="alertPlaceholder" class="mt-1"></div>
       <h1 class="mt-3">Gmail Voice App</h1>
       <h5>Welcome to the Gmail Voice App!</h5>
       <p class="lh-base text-break mb-3">
@@ -412,6 +411,7 @@
      * @param {string} date Date of the message.
      * @param {string} body Body of the message.
      */
+     
     
     /**
      * Send an email using the Gmail API.
@@ -433,7 +433,6 @@
         console.log(to + subject + body);
 
         sendEmail(to, subject, body);
-        document.getElementById("email_form").reset();
       }
      )
      
@@ -463,56 +462,15 @@
         'resource': {
           'raw': base64EncodedEmail
         }
-       }).then(function(response) {
+      }).then(function(response) {
         console.log("Email sent successfully:", response);
-        success();
+        alert('Email sent successfully!');
       }, function(error) {
         console.error("Error sending email:", error);
-        failed();
+        alert('Failed to send email.');
       });
     }
 
-    function success() {
-      var alertPlaceholder = document.getElementById('alertPlaceholder');
-      var alert = document.createElement('div');
-      alert.className = 'alert alert-success alert-dismissible fade show';
-      alert.role = 'alert';
-      alert.innerHTML = `
-          <strong>Email</strong> sent successfully!
-      `;
-      alertPlaceholder.appendChild(alert);
-
-      // Automatically remove the alert after 5 seconds (5000 milliseconds)
-      setTimeout(function() {
-        alert.classList.remove('show');
-        alert.classList.add('fade');
-        setTimeout(function() {
-            alert.remove();
-        }, 150); // Wait for the fade-out animation to complete before removing
-      }, 5000);
-
-    }
-
-    function failed() {
-      var alertPlaceholder = document.getElementById('alertPlaceholder');
-      var alert = document.createElement('div');
-      alert.className = 'alert alert-danger alert-dismissible fade show';
-      alert.role = 'alert';
-      alert.innerHTML = `
-          <strong>Email</strong> sent successfully!
-      `;
-      alertPlaceholder.appendChild(alert);
-
-      // Automatically remove the alert after 5 seconds (5000 milliseconds)
-      setTimeout(function() {
-        alert.classList.remove('show');
-        alert.classList.add('fade');
-        setTimeout(function() {
-            alert.remove();
-        }, 150); // Wait for the fade-out animation to complete before removing
-      }, 5000);
-
-    }
     // voice system
     // init speechsynth API
     function speakText(text, callback) {
@@ -590,7 +548,7 @@
     }
 
     function inputTo(){
-      speakText("Please say the email name of the receiver.", () =>{
+      speakText("Please say the email of the receiver.", () =>{
         recognition.start();
         recognition.onresult = (event) => {
           let email = event.results[0][0].transcript.toLowerCase();
@@ -602,7 +560,7 @@
               confirm = sanitizeInput(confirm);
               if (confirm === 'yes'){
                 console.log(email);
-                document.getElementById("to").value = email."gmail.com";
+                document.getElementById("to").value = email;
                 inputSubject();
               }else{
                 inputTo();
@@ -689,21 +647,7 @@
         }
       };
     })
-
   }
-    const wordsToNumbers = {
-    "one": 1,
-    "two": 2,
-    "three": 3,
-    "four": 4,
-    "five": 5,
-    "1": 1,
-    "2": 2,
-    "3": 3,
-    "4": 4,
-    "5": 5
-    // Add more mappings as needed
-  };
 
   function message() {
     document.getElementById("message-tab").click();
@@ -711,11 +655,8 @@
       recognition.start();
       recognition.onresult = (event) => {
         const action = event.results[0][0].transcript.toLowerCase();
-        const input = action.match(/\b(one|two|three|four|five|1|2|3|4|5)\b/); // Extract the word representing the number
-
-        const number = input ? wordsToNumbers[input[0]] : NaN; // Convert the word to a number
+        const number = parseInt(action.match(/\d+/)); // Extract the number from the spoken input
         //action = sanitizeInput(caction);
-     
   
         if (!isNaN(number)) {
           var selectedMessage = messagesArray.find(m => m.number === number);
