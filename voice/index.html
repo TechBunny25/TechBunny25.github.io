@@ -332,22 +332,7 @@
         appendTableRow(message.number, message.from, message.subject, message.date, message.snippet, message.body);
       });
     }
-    /**
-     * Open the message in a new page.
-     *
-     * @param {string} subject Subject of the message.
-     * @param {string} from Sender of the message.
-     * @param {string} date Date of the message.
-     * @param {string} body Body of the message.
-     */
-     function openMessageInNewPage(subject, from, date, body) {
-      var newWindow = window.open('', '_blank');
-      newWindow.document.write('<html><head><link rel="icon" type="image/x-icon" href="image/gmail logo.svg"><title>' + subject + '</title></head><body>');
-      newWindow.document.write('<h1 style="text-align: center; margin-top:2rem;">' + subject + '</h1>');
-      newWindow.document.write('<div style="margin: 0 2rem">' + body + '</div>');
-      newWindow.document.write('</body></html>');
-      newWindow.document.close();
-    }
+    
 
     /**
      * Append a row to the messages table with the given message details.
@@ -371,6 +356,23 @@
         openMessageInNewPage(subject, from, date, body);
       };
       console.log(number);
+
+      /**
+     * Open the message in a new page.
+     *
+     * @param {string} subject Subject of the message.
+     * @param {string} from Sender of the message.
+     * @param {string} date Date of the message.
+     * @param {string} body Body of the message.
+     */
+     function openMessageInNewPage(subject, from, date, body) {
+      var newWindow = window.open('', '_blank');
+      newWindow.document.write('<html><head><link rel="icon" type="image/x-icon" href="image/gmail logo.svg"><title>' + subject + '</title></head><body>');
+      newWindow.document.write('<h1 style="text-align: center; margin-top:2rem;">' + subject + '</h1>');
+      newWindow.document.write('<div style="margin: 0 2rem">' + body + '</div>');
+      newWindow.document.write('</body></html>');
+      newWindow.document.close();
+    }
       let accordion = document.getElementById('accordionExample');
       let accordionItem = document.createElement('div');
       let accordionTitle = document.createElement('h2');
