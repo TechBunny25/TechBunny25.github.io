@@ -655,9 +655,12 @@
       recognition.start();
       recognition.onresult = (event) => {
         const action = event.results[0][0].transcript.toLowerCase();
-        const number = parseInt(action.match(/\d+/)); // Extract the number from the spoken input
+        const input = action.match(/\b(one|two|three|four|five|1|2|3|4|5)\b/); // Extract the word representing the number
+
+        const number = input ? wordsToNumbers[input[0]] : NaN; // Convert the word to a number
         //action = sanitizeInput(caction);
-  
+
+
         if (!isNaN(number)) {
           var selectedMessage = messagesArray.find(m => m.number === number);
           if (selectedMessage) {
