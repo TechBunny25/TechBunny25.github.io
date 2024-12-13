@@ -38,7 +38,7 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-primary">Save changes</button>
+              <button type="button" id="save" class="btn btn-primary">Save changes</button>
             </div>
           </div>
         </div>
@@ -498,14 +498,19 @@
       });
     }
 
+    let save = document.getElementById("save");
+    save.addEventListener('click', () => {
+      let rate = document.getElementById("rate").value;
+      let pitch = document.getElementById("pitch").value;
+      console.log(rate,pitch);
+    
+       
+    });
     // voice system
     // init speechsynth API
     function speakText(text, callback) {
       const speech = new SpeechSynthesisUtterance(text);
-      let rate = document.getElementById("rate").value;
-      let pitch = document.getElementById("pitch").value;
       // Optional: Set parameters
-      console.log(rate,pitch);
       speech.lang = 'en-US'; // Language
       speech.rate = 1; // Speed (0.1 to 10)
       speech.pitch = 1; // Pitch (0 to 2)
