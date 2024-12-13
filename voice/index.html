@@ -502,8 +502,8 @@
     // init speechsynth API
     function speakText(text, callback) {
       const speech = new SpeechSynthesisUtterance(text);
-      rate = document.getElementById("rate").value;
-      pitch = document.getElementById("pitch").value;
+      let rate = document.getElementById("rate").value;
+      let pitch = document.getElementById("pitch").value;
       // Optional: Set parameters
       console.log(rate,pitch);
       speech.lang = 'en-US'; // Language
