@@ -29,9 +29,9 @@
             </div>
             <div class="modal-body pe-4 ps-4">
               <label for="customRange2" class="form-label">Rate</label>
-              <input type="range" class="form-range" id="rate" min="0" max="5" id="customRange2">
+              <input type="range" class="form-range" id="rate" min="0" max="5" value="1" id="customRange2">
               <label for="customRange2" class="form-label">Pitch</label>
-              <input type="range" class="form-range" id="pitch" min="0" max="5" id="customRange2">
+              <input type="range" class="form-range" id="pitch" min="0" max="2" value="1" id="customRange2">
               <div class="d-flex justify-content-between">
                 <a href="#" class="p-2 btn" id="start" title="start listening"><i class="fa-solid fa-ear-listen text-success"></i></a>
                 <a href="#" class="p-2 btn" id="stop" title="stop listening"><i class="fa-solid fa-ear-deaf text-danger"></i></a>
@@ -499,11 +499,10 @@
     }
 
     let save = document.getElementById("save");
-      let rate = document.getElementById("rate").value;
-      let pitch = document.getElementById("pitch").value;
+    let rate = document.getElementById("rate").value;
+    let pitch = document.getElementById("pitch").value;
     
-      save.addEventListener('click', () => {
-      
+    save.addEventListener('click', () => {      
       console.log(rate , pitch);    
     });
     // voice system
@@ -512,8 +511,8 @@
       const speech = new SpeechSynthesisUtterance(text);
       // Optional: Set parameters
       speech.lang = 'en-US'; // Language
-      speech.rate = 1; // Speed (0.1 to 10)
-      speech.pitch = 1; // Pitch (0 to 2)
+      speech.rate = rate; // Speed (0.1 to 10)
+      speech.pitch = pitch; // Pitch (0 to 2)
       speech.onend = () => {
         if (callback) {
             callback();
